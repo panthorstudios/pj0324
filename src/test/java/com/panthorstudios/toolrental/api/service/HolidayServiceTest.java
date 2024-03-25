@@ -41,15 +41,28 @@ class HolidayServiceTest {
     }
 
     @Test
-    void independenceDayObserved_onFridayIfSaturday() {
+    void testIndependenceDayObserved_onFridayIfSaturday() {
         int year = 2020; // July 4, 2020, is a Saturday
         Set<LocalDate> holidays = holidayService.getHolidays(year, year);
         LocalDate observedJuly4 = LocalDate.of(year, 7, 3); // Observed on Friday, July 3, 2020
         assertTrue(holidays.contains(observedJuly4), "Independence Day should be observed on Friday if it falls on Saturday.");
     }
-
     @Test
-    void independenceDayObserved_onMondayIfSunday() {
+    void testIndependenceDayObserved_onThursday() {
+        int year = 2024; // July 4, 2024, is a Thursday
+        Set<LocalDate> holidays = holidayService.getHolidays(year, year);
+        LocalDate observedJuly4 = LocalDate.of(year, 7, 4); // Observed on Thursday, July 4, 2024
+        assertTrue(holidays.contains(observedJuly4), "Independence Day should be observed on Thursday.");
+    }
+    @Test
+    void testLaborDayObserved_onMonday() {
+        int year = 2024; // July 4, 2024, is a Thursday
+        Set<LocalDate> holidays = holidayService.getHolidays(year, year);
+        LocalDate observedLaborDay = LocalDate.of(year, 9, 2); // Observed on Monday, Sept 2, 2024
+        assertTrue(holidays.contains(observedLaborDay), "Independence Day should be observed on Monday.");
+    }
+    @Test
+    void testIndependenceDayObserved_onMondayIfSunday() {
         int year = 2021; // July 4, 2021, is a Sunday
         Set<LocalDate> holidays = holidayService.getHolidays(year, year);
         LocalDate observedJuly4 = LocalDate.of(year, 7, 5); // Observed on Monday, July 5, 2021
@@ -57,7 +70,7 @@ class HolidayServiceTest {
     }
 
     @Test
-    void getHolidays_includesLaborDay() {
+    void testGetHolidays_includesLaborDay() {
         int year = 2022; // To test a specific year's Labor Day
         Set<LocalDate> holidays = holidayService.getHolidays(year, year);
         LocalDate laborDay = LocalDate.of(year, 9, 1).with(java.time.temporal.TemporalAdjusters.firstInMonth(java.time.DayOfWeek.MONDAY));
@@ -65,7 +78,7 @@ class HolidayServiceTest {
     }
 
     @Test
-    void laborDay_isFirstMondayOfSeptember() {
+    void testLaborDay_isFirstMondayOfSeptember() {
         int year = 2023; // Just choosing a year for example
         Set<LocalDate> holidays = holidayService.getHolidays(year, year);
         LocalDate expectedLaborDay = LocalDate.of(year, 9, 4); // First Monday of September 2023

@@ -9,6 +9,14 @@ toolrental is an application for generating a rental agreement for renting a too
 
 ![component diagram](./images/component-diagram.png?raw=true)
 
+## Building the application
+
+To build the application, you can use the following command:
+```
+mvn clean package
+```
+This will generate a jar file called ```toolrental.jar``` in the target directory.
+
 ## Getting Started
 To run the application locally, you can use the following command:
 ### command line mode
