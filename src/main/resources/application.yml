@@ -1,0 +1,83 @@
+spring:
+  application:
+      name: ToolRentalApplication
+  main:
+      banner-mode: "off"
+
+server:
+  port: 8080
+  
+logging:
+  level:
+    root: ERROR
+    org.springframework: ERROR
+    com.panthorstudios.toolrental: WARN
+
+app:
+  mode: cli
+  store-id: 1
+  terminal-id: 1
+  tools-map:
+    "LADW":
+      code: "LADW"
+      type-code: "LADDER"
+      brand: "Werner"
+
+    "CHNS":
+      code: "CHNS"
+      type-code: "CHAINSAW"
+      brand: "Stihl"
+
+    "JAKR":
+      code: "JAKR"
+      type-code: "JACKHAMMER"
+      brand: "Ridgid"
+
+    "JAKD":
+      code: "JAKD"
+      type-code: "JACKHAMMER"
+      brand: "DeWalt"
+
+  tool-types-map:
+    "LADDER":
+      type-code: "LADDER"
+      label: "Ladder"
+      daily-charge: 1.99
+      chargeable-on-weekdays: true
+      chargeable-on-weekends: true
+      chargeable-on-holidays: false
+
+    "CHAINSAW":
+      type-code: "CHAINSAW"
+      label: "Chainsaw"
+      daily-charge: 1.49
+      chargeable-on-weekdays: true
+      chargeable-on-weekends: false
+      chargeable-on-holidays: true
+
+    "JACKHAMMER":
+      type-code: "JACKHAMMER"
+      label: "Jackhammer"
+      daily-charge: 2.99
+      chargeable-on-weekdays: true
+      chargeable-on-weekends: false
+      chargeable-on-holidays: false
+
+  holiday-rules-list:
+    - country-code: "US"
+      name: "Independence Day"
+      type: FIXED_DATE
+      month: 7
+      day: 4
+      day-of-week: null
+      occurrence: null
+      weekend-function-code: "ADJUST_WEEKEND_TO_CLOSEST_WEEKDAY"
+
+    - country-code: "US"
+      type: FIXED_WEEKDAY
+      name: "Labor Day"
+      month: 9
+      day: null
+      day-of-week: 1
+      occurrence: 1
+      weekend-function-code: null

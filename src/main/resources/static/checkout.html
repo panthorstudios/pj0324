@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool Rental Home</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin-top: 20px;
+        }
+        .form-control.narrow-input {
+            width: 33%;
+        }
+    #resultContainer {
+        text-align: left; /* Align text to the left */
+    }
+    #rentalAgreementTable {
+        width: auto; /* Set the table width to be only as wide as needed */
+        margin: 0; /* Remove margin to align with the start of the container */
+    }
+    #rentalAgreementTable .narrow-table {
+        width: 100%; /* fill the container width */
+    }
+    #createAnother {
+        display: block; /* Make the button a block element to fill the container */
+        margin-top: 10px; /* Add some space above the button */
+    }
+    .error {
+        color: #D8000C; /* Red text color */
+        background-color: #FFD2D2; /* Light red background */
+        border: 1px solid #D8000C; /* Red border */
+        border-radius: 4px; /* Rounded corners */
+        padding: 5px 10px; /* Some padding */
+        margin: 5px 0; /* Margin to separate it from other elements */
+        font-size: 0.9em; /* Slightly smaller text */
+        width: 33%;
+    }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Rental Agreement Generator</h1>
+    <form id="rentalForm" class="mb-3">
+        <div class="form-group">
+            <label for="toolCode">Tool Code</label>
+            <select class="form-control narrow-input" id="toolCode" name="toolCode">
+                <option value="">Select a tool code...</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="rentalDays">Rental Days</label>
+            <input type="number" class="form-control narrow-input" id="rentalDays" name="rentalDays" min="1" step="1" value="1">
+        </div>
+        <div class="form-group">
+            <label for="discountPercent">Discount Percent</label>
+            <input type="number" class="form-control narrow-input" id="discountPercent" name="discountPercent" min="0" max="100" step="1" value="0">
+        </div>
+        <div class="form-group">
+            <label for="checkoutDate">Checkout Date</label>
+            <input type="date" class="form-control narrow-input" id="checkoutDate" name="checkoutDate">
+        </div>
+        <button type="button" id="generateButton" class="btn btn-primary">Generate Rental Agreement</button>
+    </form>
+
+    <div id="resultContainer" style="display: none;">
+        <table id="rentalAgreementTable" class="table narrow-table">
+            <tbody>
+            <!-- Content will be filled by jQuery -->
+            </tbody>
+        </table>
+        <button id="createAnother" class="btn btn-secondary">Create another</button>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.ajax({
+        url: '/api/tools',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            var $toolCodeSelect = $('#toolCode');
+            //console.info("Fetched tool codes:", JSON.stringify(response));
+            var codes = response.map(function(tool) { return tool.code; }).sort();
+            // Iterate over the sorted codes and create dropdown options
+            codes.forEach(function(code) {
+                $toolCodeSelect.append($('<option>', {
+                    value: code,
+                    text: code
+                }));
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error("Error fetching tool codes:", error);
+        }
+    });
+
+    $('#createAnother').click(function() {
+        $('#resultContainer').hide(); // Hide the result and button
+        $('#rentalForm').show(); // Show the form again
+        // Optionally, clear the form fields
+        $('#rentalForm').trigger("reset");
+    });
+
+        $('#generateButton').click(function() {
+            // Validation flag
+            let isValid = true;
+
+            // Reset previous error messages
+            $('.error').remove();
+
+            // Get form values
+            var toolCode = $('#toolCode').val().trim();
+            var checkoutDate = $('#checkoutDate').val().trim();
+            var rentalDays = $('#rentalDays').val().trim();
+            var discountPercent = $('#discountPercent').val().trim();
+
+            // Validate toolCode
+            if (!toolCode) {
+                isValid = false;
+                $('#toolCode').after('<div class="error">Tool code is required.</div>');
+            }
+
+            // Validate checkoutDate
+            if (!checkoutDate) {
+                isValid = false;
+                $('#checkoutDate').after('<div class="error">Checkout date is required.</div>');
+            }
+
+            // Validate rentalDays
+            if (!rentalDays || !Number.isInteger(Number(rentalDays)) || Number(rentalDays) <= 0) {
+                isValid = false;
+                $('#rentalDays').after('<div class="error">Rental days must be an integer greater than 0.</div>');
+            }
+
+            // Validate discountPercent
+            if (!discountPercent || !Number.isInteger(Number(discountPercent)) || Number(discountPercent) < 0 || Number(discountPercent) > 100) {
+                isValid = false;
+                $('#discountPercent').after('<div class="error">Discount percent must be an integer between 0 and 100.</div>');
+            }
+
+            // Proceed with AJAX call if validation passes
+            if (isValid) {
+                var url = "http://localhost:8080/api/checkout?toolCode=" + encodeURIComponent(toolCode) + "&checkoutDate=" + encodeURIComponent(checkoutDate) + "&rentalDays=" + encodeURIComponent(rentalDays) + "&discountPercent=" + encodeURIComponent(discountPercent);
+
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    success: function(response) {
+                    displayRentalAgreement(response);
+                    //    $('#result').text(JSON.stringify(response));
+                        $('#rentalForm').hide(); // Hide the form
+                        $('#resultContainer').show(); // Show the result and "Create another" button
+                    },
+                    error: function(xhr, status, error) {
+                        $('#result').text("Error: " + error);
+                        $('#resultContainer').show(); // Show the result and "Create another" button
+                    }
+                });
+            } else {
+                $('#resultContainer').hide();
+            }
+        });
+    });
+
+    const fieldNames = {
+    "toolCode": "Tool code",
+    "toolType": "Tool type",
+    "toolBrand": "Tool brand",
+    "rentalDays": "Rental days",
+    "checkoutDate": "Check out date",
+    "dueDate": "Due date",
+    "dailyRentalCharge": "Daily rental charge",
+    "chargeDays": "Charge days",
+    "preDiscountCharge": "Pre-discount charge",
+    "discountPercent": "Discount percent",
+    "discountAmount": "Discount amount",
+    "finalCharge": "Final charge"
+};
+
+// Function to display the rental agreement in a table
+function displayRentalAgreement(response) {
+    var $tableBody = $('#rentalAgreementTable tbody');
+    $tableBody.empty(); // Clear any previous content
+
+    // Iterate through the fieldNames object and create table rows
+    $.each(fieldNames, function(key, userFriendlyName) {
+  let value = response[key];
+        // Format dates
+        if (key === 'checkoutDate' || key === 'dueDate') {
+            value = formatDate(value);
+        }
+        // Format money
+        else if (key === 'dailyRentalCharge' || key === 'preDiscountCharge' || key === 'discountAmount' || key === 'finalCharge') {
+            value = formatMoney(value);
+        }
+        // Format integers
+        else if (key === 'rentalDays' || key === 'chargeDays') {
+            value = formatInteger(value);
+        }
+         else if (key === 'discountPercent') {
+            value = formatPercentage(value);
+        }
+
+            var $row = $('<tr>').append(
+                $('<td>').html('<b>' + userFriendlyName + '</b>'), // Static user-friendly field name
+                $('<td>').text(value) // Formatted value from the response
+            );
+            $tableBody.append($row);
+    });
+
+    function formatDate(dateString) {
+    const date = new Date(dateString + "T00:00:00"); // add time to avoid UTC conversion
+    let day = ('0' + date.getDate()).slice(-2); // Add leading zero and slice last 2 digits
+    let month = ('0' + (date.getMonth() + 1)).slice(-2); // Add leading zero and slice last 2 digits
+    let year = date.getFullYear().toString().substr(-2); // Get last 2 digits of year
+    return month + '/' + day + '/' + year;
+}
+
+// Helper function to format money values as $xxxx.xx
+function formatMoney(number) {
+    return '$' + number.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+}
+
+// Helper function to format integers with commas
+function formatInteger(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+function formatPercentage(number) {
+    return number + "%";
+}
+
+}
+
+</script>
+<br/><br/>
+
+</body>
+</html>
