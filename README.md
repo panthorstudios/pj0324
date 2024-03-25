@@ -9,6 +9,26 @@ toolrental is an application for generating a rental agreement for renting a too
 
 ![component diagram](./images/component-diagram.png?raw=true)
 
+## Package Structure
+
+The application is divided into the following packages. 
+
+Most of the business logic and domain classes are in the api package, along with REST controllers.
+
+The cli package contains the command line interface classes. 
+
+* com.panthorstudios.toolrental - main package
+  * api - contains domain, service classes and web controllers
+    * controller - web controllers (REST)
+    * domain - contains the domain classes
+    * service - contains the service classes
+    * exception - contains custom exception classes
+  * cli - contains the command line interface classes
+    * adapter - contains the adapter classes for the command line
+    * controller - contains the controller class 
+  * properties - contains the properties class AppProperties
+    * util - contains the utility classes including WeekendAdjusterFunctionFactory
+
 ## Building the application
 
 To build the application, you can use the following command:
@@ -18,7 +38,7 @@ mvn clean package
 This will generate a jar file called ```toolrental.jar``` in the target directory.
 
 ## Getting Started
-To run the application locally, you can use the following command:
+To run the application locally, you can use the following command within the same directory as toolrental.jar:
 ### command line mode
 ```
 java -jar toolrental.jar

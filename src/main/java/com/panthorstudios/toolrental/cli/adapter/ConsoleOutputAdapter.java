@@ -1,4 +1,4 @@
-package com.panthorstudios.toolrental.api.service;
+package com.panthorstudios.toolrental.cli.adapter;
 
 import org.springframework.stereotype.Component;
 
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
  * This class is responsible for writing output to the console.
  */
 @Component
-public class ConsoleOutputService implements OutputService {
+public class ConsoleOutputAdapter implements OutputAdapter {
     public void print(String message) {
         System.out.print(message);
     }

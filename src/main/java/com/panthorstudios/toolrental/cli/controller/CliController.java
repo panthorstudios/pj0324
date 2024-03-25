@@ -6,6 +6,8 @@ import com.panthorstudios.toolrental.api.exception.InvalidCheckoutDateException;
 import com.panthorstudios.toolrental.api.exception.InvalidDiscountPercentException;
 import com.panthorstudios.toolrental.api.exception.InvalidRentalDaysException;
 import com.panthorstudios.toolrental.api.exception.InvalidToolCodeException;
+import com.panthorstudios.toolrental.cli.adapter.InputAdapter;
+import com.panthorstudios.toolrental.cli.adapter.OutputAdapter;
 import com.panthorstudios.toolrental.util.FormattingTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,24 +23,24 @@ public class CliController {
 
     private final CheckoutService checkoutService;
     private final ToolService toolService;
-    private final InputService inputService;
-    private final OutputService outputService;
+    private final InputAdapter inputAdapter;
+    private final OutputAdapter outputAdapter;
 
     @Autowired
-    public CliController(CheckoutService checkoutService, ToolService toolService,InputService inputService, OutputService outputService) {
+    public CliController(CheckoutService checkoutService, ToolService toolService, InputAdapter inputAdapter, OutputAdapter outputAdapter) {
         this.checkoutService = checkoutService;
         this.toolService = toolService;
-        this.inputService = inputService;
-        this.outputService = outputService;
+        this.inputAdapter = inputAdapter;
+        this.outputAdapter = outputAdapter;
     }
 
     /**
      * Executes the CLI controller
      */
     public void execute() {
-        outputService.printLine("Rental Agreement Generator");
-        outputService.printLine("--------------------------");
-        outputService.printLine();
+        outputAdapter.printLine("Rental Agreement Generator");
+        outputAdapter.printLine("--------------------------");
+        outputAdapter.printLine();
         List<String> validToolCodes = toolService.getAllToolCodes();
         // Prompt the user for input
         do {
@@ -52,15 +54,15 @@ public class CliController {
                 RentalAgreement rentalAgreement = checkoutService.toolRentalCheckout(
                         toolCode, checkoutDate, rentalDays, discountPercent);
 
-                outputService.printLine();
-                outputService.printLine("Rental Agreement");
-                outputService.printLine("----------------");
+                outputAdapter.printLine();
+                outputAdapter.printLine("Rental Agreement");
+                outputAdapter.printLine("----------------");
 
                 // use method in RentalAgreement to print to console as per requirement
-                rentalAgreement.print(outputService);
+                rentalAgreement.print(outputAdapter);
 
             } catch (Exception e) {
-                outputService.printLine("An error occurred: " + e.getMessage());
+                outputAdapter.printLine("An error occurred: " + e.getMessage());
             }
         } while (promptForAnother());
         System.exit(0);
@@ -89,8 +91,8 @@ public class CliController {
      * @return a valid tool code
      */
     private String promptForToolCode() {
-        outputService.print("Enter tool code: ");
-        return inputService.readLine();
+        outputAdapter.print("Enter tool code: ");
+        return inputAdapter.readLine();
     }
 
     /** Validates the tool code.
@@ -104,7 +106,7 @@ public class CliController {
             checkoutService.validateToolCode(toolCode);
             return true;
         } catch (InvalidToolCodeException e) {
-            outputService.printLine(e.getMessage());
+            outputAdapter.printLine(e.getMessage());
             displayValidToolCodes(validToolCodes);
             return false;
         }
@@ -116,9 +118,9 @@ public class CliController {
      * @param validToolCodes the valid tool codes
      */
     private void displayValidToolCodes(Set<String> validToolCodes) {
-        outputService.printLine("Valid codes:");
-        validToolCodes.forEach(outputService::printLine);
-        outputService.printLine();
+        outputAdapter.printLine("Valid codes:");
+        validToolCodes.forEach(outputAdapter::printLine);
+        outputAdapter.printLine();
     }
 
     /**
@@ -146,7 +148,7 @@ public class CliController {
         try {
             return LocalDate.parse(dateString, FormattingTools.SHORT_DATE_FORMATTER);
         } catch (DateTimeParseException e) {
-            outputService.printLine("Invalid checkout date format. Please use MM/DD/YY.");
+            outputAdapter.printLine("Invalid checkout date format. Please use MM/DD/YY.");
             return null;
         }
     }
@@ -162,7 +164,7 @@ public class CliController {
             checkoutService.validateCheckoutDate(date);
             return true;
         } catch (InvalidCheckoutDateException e) { // Assuming this is a custom exception
-            outputService.printLine(e.getMessage());
+            outputAdapter.printLine(e.getMessage());
             return false;
         }
     }
@@ -173,8 +175,8 @@ public class CliController {
      * @return a valid checkout date
      */
     private String promptForCheckoutDate() {
-        outputService.print("Enter checkout date (MM/DD/YY): ");
-        return inputService.readLine();
+        outputAdapter.print("Enter checkout date (MM/DD/YY): ");
+        return inputAdapter.readLine();
     }
 
     /**
@@ -183,8 +185,8 @@ public class CliController {
      * @return a valid number of rental days
      */
     private String promptForRentalDays() {
-        outputService.print("Enter rental days (> 0): ");
-        return inputService.readLine();
+        outputAdapter.print("Enter rental days (> 0): ");
+        return inputAdapter.readLine();
     }
     /**
      * Parses a rental days string
@@ -196,7 +198,7 @@ public class CliController {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            outputService.printLine("Invalid rental days. Please enter a positive integer.");
+            outputAdapter.printLine("Invalid rental days. Please enter a positive integer.");
             return null;
         }
     }
@@ -212,7 +214,7 @@ public class CliController {
             checkoutService.validateRentalDays(rentalDays);
             return true;
         } catch (InvalidRentalDaysException e) {
-            outputService.printLine(e.getMessage());
+            outputAdapter.printLine(e.getMessage());
             return false;
         }
     }
@@ -253,8 +255,8 @@ public class CliController {
      * @return a valid discount percent
      */
     private String promptForDiscountPercent() {
-        outputService.print("Enter discount percent (0-100): ");
-        return inputService.readLine();
+        outputAdapter.print("Enter discount percent (0-100): ");
+        return inputAdapter.readLine();
     }
 
     /**
@@ -267,7 +269,7 @@ public class CliController {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            outputService.printLine("Invalid discount percent. Please enter a number between 0 and 100.");
+            outputAdapter.printLine("Invalid discount percent. Please enter a number between 0 and 100.");
             return null;
         }
     }
@@ -283,7 +285,7 @@ public class CliController {
             checkoutService.validateDiscountPercent(percent);
             return true;
         } catch (InvalidDiscountPercentException e) { // Assume this is a specific checked exception
-            outputService.printLine(e.getMessage());
+            outputAdapter.printLine(e.getMessage());
             return false;
         }
     }
@@ -293,9 +295,9 @@ public class CliController {
      * @return true if the user wants to enter another rental agreement, false otherwise
      */
     private boolean promptForAnother() {
-        outputService.print("Hit Return for another Rental Agreement or 'q' to quit: ");
-        String cmdString = inputService.readLine();
-        outputService.printLine();
+        outputAdapter.print("Hit Return for another Rental Agreement or 'q' to quit: ");
+        String cmdString = inputAdapter.readLine();
+        outputAdapter.printLine();
         return !cmdString.equals("q");
     }
 }

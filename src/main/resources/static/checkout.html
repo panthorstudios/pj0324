@@ -147,14 +147,20 @@
 
             // Proceed with AJAX call if validation passes
             if (isValid) {
-                var url = "http://localhost:8080/api/checkout?toolCode=" + encodeURIComponent(toolCode) + "&checkoutDate=" + encodeURIComponent(checkoutDate) + "&rentalDays=" + encodeURIComponent(rentalDays) + "&discountPercent=" + encodeURIComponent(discountPercent);
-
+                var url = "/api/checkout";
+                var data = {
+                    toolCode: toolCode,
+                    checkoutDate: checkoutDate,
+                    rentalDays: rentalDays,
+                    discountPercent: discountPercent
+                };
                 $.ajax({
                     url: url,
-                    type: "GET",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(data),
                     success: function(response) {
                     displayRentalAgreement(response);
-                    //    $('#result').text(JSON.stringify(response));
                         $('#rentalForm').hide(); // Hide the form
                         $('#resultContainer').show(); // Show the result and "Create another" button
                     },

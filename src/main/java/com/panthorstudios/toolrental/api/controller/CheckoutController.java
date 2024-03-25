@@ -4,10 +4,7 @@ import com.panthorstudios.toolrental.api.domain.RentalAgreement;
 import com.panthorstudios.toolrental.api.service.CheckoutService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
@@ -17,17 +14,18 @@ public class CheckoutController {
 
     private final CheckoutService checkoutService;
 
+    protected record RentalAgreementRequest(String toolCode, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate checkoutDate, int rentalDays, int discountPercent){};
+
     public CheckoutController(CheckoutService checkoutService) {
         this.checkoutService = checkoutService;
     }
-    @GetMapping("/checkout")
-    public ResponseEntity<RentalAgreement> toolRentalCheckoutGetHandler(
-        @RequestParam String toolCode,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkoutDate,
-        @RequestParam int rentalDays,
-        @RequestParam int discountPercent) {
+    @PostMapping("/checkout")
+    public ResponseEntity<RentalAgreement> toolRentalCheckoutGetHandler(@RequestBody RentalAgreementRequest rentalAgreementRequest) {
+        RentalAgreement rentalAgreement = checkoutService.toolRentalCheckout(rentalAgreementRequest.toolCode(),
+                rentalAgreementRequest.checkoutDate(),
+                rentalAgreementRequest.rentalDays(),
+                rentalAgreementRequest.discountPercent());
 
-        RentalAgreement rentalAgreement = checkoutService.toolRentalCheckout(toolCode, checkoutDate, rentalDays, discountPercent);
         return ResponseEntity.ok(rentalAgreement);
     }
 }

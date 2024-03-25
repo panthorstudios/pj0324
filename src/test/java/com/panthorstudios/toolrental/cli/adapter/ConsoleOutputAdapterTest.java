@@ -1,5 +1,6 @@
-package com.panthorstudios.toolrental.api.service;
+package com.panthorstudios.toolrental.cli.adapter;
 
+import com.panthorstudios.toolrental.cli.adapter.ConsoleOutputAdapter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,7 +9,7 @@ import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ConsoleOutputServiceTest {
+public class ConsoleOutputAdapterTest {
 
     private final PrintStream originalOut = System.out;
     private final PrintStream originalErr = System.err;
@@ -41,7 +42,7 @@ public class ConsoleOutputServiceTest {
     @Test
     public void print_ShouldPrintMessage() {
         // Arrange
-        ConsoleOutputService outputService = new ConsoleOutputService();
+        ConsoleOutputAdapter outputService = new ConsoleOutputAdapter();
         String message = "Hello, World!";
 
         // Act
@@ -56,7 +57,7 @@ public class ConsoleOutputServiceTest {
     @Test
     public void printLine_ShouldPrintNewLine() {
         // Arrange
-        ConsoleOutputService outputService = new ConsoleOutputService();
+        ConsoleOutputAdapter outputService = new ConsoleOutputAdapter();
 
         // Act
         outputService.printLine();
@@ -70,7 +71,7 @@ public class ConsoleOutputServiceTest {
     @Test
     public void printLineWithMessage_ShouldPrintMessageWithNewLine() {
         // Arrange
-        ConsoleOutputService outputService = new ConsoleOutputService();
+        ConsoleOutputAdapter outputService = new ConsoleOutputAdapter();
         String message = "Test message";
 
         // Act
@@ -85,7 +86,7 @@ public class ConsoleOutputServiceTest {
     @Test
     public void printError_ShouldPrintErrorMessage() {
         // Arrange
-        ConsoleOutputService outputService = new ConsoleOutputService();
+        ConsoleOutputAdapter outputService = new ConsoleOutputAdapter();
         String errorMessage = "Error message";
 
         // Act

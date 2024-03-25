@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 import java.util.Set;
-import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,15 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class HolidayServiceTest {
 
     private HolidayService holidayService;
-
     @Autowired
     private AppProperties appProperties;
-
-    private LocalDate friday = LocalDate.of(2024,3,22);
-
-    private LocalDate saturday = LocalDate.of(2024,3,23);
-    private LocalDate sunday = LocalDate.of(2024,3,24);
-    private LocalDate monday = LocalDate.of(2024,3,25);
 
     @BeforeEach
     void setUp() {
@@ -100,49 +92,4 @@ class HolidayServiceTest {
         assertEquals(LocalDate.of(2024,9,2), holidayService.calculateHolidayDate(2024, appProperties.getHolidayRulesList().get(1)));
     }
 
-    /**
-     * Test the adjustWeekendToClosestWeekday method with a Sunday date.
-     */
-    @Test
-    void testAdjustWeekendToClosestWeekdaySunday() {
-        Function<LocalDate,LocalDate> adjustFunction = holidayService.adjustWeekendToClosestWeekday();
-        assertEquals(monday, adjustFunction.apply(sunday));
-    }
-    /**
-     * Test the adjustWeekendToClosestWeekday method with a Saturday date.
-     */
-    @Test
-    void testAdjustWeekendToClosestWeekdaySaturday() {
-        Function<LocalDate,LocalDate> adjustFunction = holidayService.adjustWeekendToClosestWeekday();
-        assertEquals(friday, adjustFunction.apply(saturday));
-    }
-    /**
-     * Test the adjustWeekendToFriday method with a Saturday date.
-     */
-    @Test
-    void testAdjustWeekendToFridaySaturday() {
-        Function<LocalDate,LocalDate> adjustFunction = holidayService.adjustWeekendToFriday();
-        assertEquals(friday, adjustFunction.apply(saturday));
-    }
-    /**
-     * Test the adjustWeekendToFriday method with a Sunday date.
-     */
-    @Test
-    void testAdjustWeekendToFridaySunday() {
-        Function<LocalDate,LocalDate> adjustFunction = holidayService.adjustWeekendToFriday();
-        assertEquals(friday, adjustFunction.apply(sunday));
-    }
-    /**
-     * Test the adjustWeekendToMonday method with a Sunday date.
-     */
-    @Test
-    void testAdjustWeekendToMondaySunday() {
-        Function<LocalDate,LocalDate> adjustFunction = holidayService.adjustWeekendToMonday();
-        assertEquals(monday, adjustFunction.apply(sunday));
-    }
-    @Test
-    void testAdjustWeekendToMondaySaturday() {
-        Function<LocalDate,LocalDate> adjustFunction = holidayService.adjustWeekendToMonday();
-        assertEquals(monday, adjustFunction.apply(saturday));
-    }
 }

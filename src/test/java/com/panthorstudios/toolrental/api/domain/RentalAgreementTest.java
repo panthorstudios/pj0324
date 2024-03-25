@@ -1,6 +1,6 @@
 package com.panthorstudios.toolrental.api.domain;
 
-import com.panthorstudios.toolrental.api.service.OutputService;
+import com.panthorstudios.toolrental.cli.adapter.OutputAdapter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -16,7 +16,7 @@ import static org.mockito.Mockito.*;
 class RentalAgreementTest {
 
     @Mock
-    private OutputService outputService;
+    private OutputAdapter outputAdapter;
 
     /**
      * Test the toString method.
@@ -111,9 +111,9 @@ class RentalAgreementTest {
                 new BigDecimal("3.80")
         );
 
-        agreement.print(outputService);
+        agreement.print(outputAdapter);
 
         // Verify that outputService.printLine() is called with the expected string
-        verify(outputService).printLine(agreement.toString());
+        verify(outputAdapter).printLine(agreement.toString());
     }
 }

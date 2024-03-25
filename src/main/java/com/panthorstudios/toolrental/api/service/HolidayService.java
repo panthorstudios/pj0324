@@ -2,6 +2,7 @@ package com.panthorstudios.toolrental.api.service;
 
 import com.panthorstudios.toolrental.properties.AppProperties;
 import com.panthorstudios.toolrental.api.domain.HolidayRule;
+import com.panthorstudios.toolrental.util.WeekendAdjusterFunctionFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.DateTimeException;
@@ -45,7 +46,7 @@ public class HolidayService {
      */
     protected LocalDate calculateHolidayDate(int year, HolidayRule rule) {
         if ("FIXED_DATE".equals(rule.type())) { // Fixed-date holiday
-            Function<LocalDate, LocalDate> weekendAdjusterFunction = getWeekendAdjusterFunction(rule.weekendFunctionCode());
+            Function<LocalDate, LocalDate> weekendAdjusterFunction = WeekendAdjusterFunctionFactory.getAdjusterFunction(rule.weekendFunctionCode());
             if (weekendAdjusterFunction == null) {
                 throw new IllegalArgumentException("Invalid weekend function code: " + rule.weekendFunctionCode());
             }
@@ -62,72 +63,5 @@ public class HolidayService {
                     .with(TemporalAdjusters.dayOfWeekInMonth(rule.occurrence(), dow));
         }
         return null;
-    }
-
-
-    /**
-     * Returns a function that adjusts a holiday date to a weekday based on the given weekend function code
-     * @param weekendFunctionCode The weekend function code
-     * @return A function that adjusts a holiday date to a weekday
-     */
-    protected Function<LocalDate, LocalDate> getWeekendAdjusterFunction(String weekendFunctionCode) {
-        return switch (weekendFunctionCode) {
-            case "ADJUST_WEEKEND_TO_CLOSEST_WEEKDAY" -> adjustWeekendToClosestWeekday();
-            case "ADJUST_WEEKEND_TO_MONDAY" -> adjustWeekendToMonday();
-            case "ADJUST_WEEKEND_TO_FRIDAY" -> adjustWeekendToFriday();
-            default -> null;
-        };
-    }
-
-
-    /**
-     * Returns a function that adjusts a holiday date to the closest weekday
-     * If a holiday is on a Saturday, it is observed on the preceding Friday
-     * If a holiday is on a Sunday, it is observed on the following Monday
-     * @return A function that adjusts a holiday date to the closest weekday
-     */
-    protected Function<LocalDate, LocalDate> adjustWeekendToClosestWeekday() {
-        return date -> {
-            if (date.getDayOfWeek() == DayOfWeek.SATURDAY) {
-                return date.minusDays(1); // Observed on Friday if on Saturday
-            } else if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
-                return date.plusDays(1); // Observed on Monday if on Sunday
-            }
-            return date;
-        };
-    }
-
-    /**
-     * Returns a function that adjusts a holiday date to the following Monday
-     * If a holiday is on a Saturday, it is observed on the following Monday
-     * If a holiday is on a Sunday, it is observed on the following Monday
-     * @return A function that adjusts a holiday date to the following Monday
-     */
-    protected Function<LocalDate, LocalDate> adjustWeekendToMonday() {
-        return date -> {
-            if (date.getDayOfWeek() == DayOfWeek.SATURDAY) {
-                return date.plusDays(2); // Observed on Monday if on Saturday
-            } else if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
-                return date.plusDays(1); // Observed on Monday if on Sunday
-            }
-            return date;
-        };
-    }
-
-    /**
-     * Returns a function that adjusts a holiday date to the preceding Friday
-     * If a holiday is on a Saturday, it is observed on the preceding Friday
-     * If a holiday is on a Sunday, it is observed on the preceding Friday
-     * @return A function that adjusts a holiday date to the preceding Friday
-     */
-    protected Function<LocalDate, LocalDate> adjustWeekendToFriday() {
-        return date -> {
-            if (date.getDayOfWeek() == DayOfWeek.SATURDAY) {
-                return date.minusDays(1); // Observed on Friday if on Saturday
-            } else if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
-                return date.minusDays(2); // Observed on Friday if on Sunday
-            }
-            return date;
-        };
     }
 }

@@ -1,5 +1,6 @@
-package com.panthorstudios.toolrental.api.service;
+package com.panthorstudios.toolrental.cli.adapter;
 
+import com.panthorstudios.toolrental.cli.adapter.ConsoleInputAdapter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,7 +9,7 @@ import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ConsoleInputServiceTest {
+public class ConsoleInputAdapterTest {
 
     private final InputStream systemIn = System.in;
 
@@ -35,7 +36,7 @@ public class ConsoleInputServiceTest {
     @Test
     public void readLine_ShouldReturnCorrectInput() {
         // Arrange
-        ConsoleInputService inputService = new ConsoleInputService();
+        ConsoleInputAdapter inputService = new ConsoleInputAdapter();
 
         // Act
         String input = inputService.readLine();

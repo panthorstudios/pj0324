@@ -1,6 +1,6 @@
 package com.panthorstudios.toolrental.api.domain;
 
-import com.panthorstudios.toolrental.api.service.OutputService;
+import com.panthorstudios.toolrental.cli.adapter.OutputAdapter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -45,7 +45,7 @@ public record RentalAgreement(String rentalAgreementId,
     /**
      * Print the rental agreement an output service (e.g. the console)
      */
-    public void print(OutputService outputService) {
-        outputService.printLine(this.toString());
+    public void print(OutputAdapter outputAdapter) {
+        outputAdapter.printLine(this.toString());
     }
 }
